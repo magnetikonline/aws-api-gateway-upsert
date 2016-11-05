@@ -1,0 +1,54 @@
+{
+	"basePath": "/stage_name",
+	"host": "api_id.execute-api.region.amazonaws.com",
+	"info": {
+		"title": "lambda-awsproxy-get-root-catchall",
+		"version": "2016-01-01T00:00:00Z"
+	},
+	"paths": {
+		"/": {
+			"get": {
+				"responses": {},
+				"x-amazon-apigateway-integration": {
+					"httpMethod": "POST",
+					"passthroughBehavior": "when_no_match",
+					"responses": {
+						"default": {
+							"statusCode": "200"
+						}
+					},
+					"type": "aws_proxy",
+					"uri": "arn:aws:apigateway::lambda:path/2015-03-31/functions/arn:aws:lambda:::function:example-awsproxy/invocations"
+				}
+			}
+		},
+		"/{proxy+}": {
+			"get": {
+				"parameters": [
+					{
+						"in": "path",
+						"name": "proxy",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {},
+				"x-amazon-apigateway-integration": {
+					"httpMethod": "POST",
+					"passthroughBehavior": "when_no_match",
+					"responses": {
+						"default": {
+							"statusCode": "200"
+						}
+					},
+					"type": "aws_proxy",
+					"uri": "arn:aws:apigateway::lambda:path/2015-03-31/functions/arn:aws:lambda:::function:example-awsproxy/invocations"
+				}
+			}
+		}
+	},
+	"schemes": [
+		"https"
+	],
+	"swagger": "2.0"
+}
