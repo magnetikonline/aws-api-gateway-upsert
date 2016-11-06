@@ -61,7 +61,7 @@ optional arguments:
 ### Lambda function policy creation
 For an API Gateway instance to successfully [invoke a Lambda function](http://docs.aws.amazon.com/lambda/latest/dg/with-on-demand-https.html), permissions allowing the gateway are required against the function itself.
 
-During the upsert of a definition, integration Lambda targets within the current account/region can have policies updated via `--apply-lambda-permissions` to match gateway requirements:
+During the upsert of a definition, integration Lambda targets within the current account/region can have policies managed via `--apply-lambda-permissions` to complement gateway requirements:
 - The `exclusive` mode will **remove all** API Gateway related permissions from Lambda functions that are not associated to the upserted API. Use this mode when referenced Lambda functions are used by a *single* API Gateway instance only.
 - Alternatively `inclusive` mode will **retain** all permissions unrelated to the current API Gateway instance - only removing what is not directly required by the current upsert API. Use this mode when Lambda functions have dependency on *multiple* API Gateway endpoints.
 
@@ -105,7 +105,9 @@ $ ./awsapigatewayupsert.py \
 	--upsert-file-json /path/to/definition.json
 ```
 
-Upsert definition `/path/to/definition.json` to an API `my-second-api` deployed at stage `development`. Lambda functions referenced within definition will have policy permissions added/removed to complement that of the definition. In addition, any Lambda permissions not associated to `my-second-api` will be removed:
+- Upsert definition `/path/to/definition.json` to an API `my-second-api` deployed at stage `development`.
+- Lambda functions referenced within definition will have policy permissions added/removed to complement that of the definition.
+- In addition, any Lambda permissions not associated to `my-second-api` will be removed:
 ```sh
 $ ./awsapigatewayupsert.py \
 	--region ap-southeast-2 \
@@ -115,7 +117,8 @@ $ ./awsapigatewayupsert.py \
 	--apply-lambda-permissions exclusive
 ```
 
-Export API named `my-first-api` deployed at stage `production` to a definition Swagger 2.0 JSON file `/path/to/definition.json`. In addition, any Lambda function referenced integration URIs will be converted to generic form ARNs:
+- Export API named `my-first-api` deployed at stage `production` to a definition Swagger 2.0 JSON file `/path/to/definition.json`.
+- In addition, any Lambda function referenced integration URIs will be converted to generic form ARNs:
 ```sh
 $ ./awsapigatewayupsert.py \
 	--region ap-southeast-2 \
