@@ -22,6 +22,10 @@ In addition all upsert operations can also be executed in a dry run mode, for te
 - Python 2.7.x.
 - [Boto 3](https://boto3.readthedocs.io/en/latest/).
 
+```sh
+$ pip install -r requirements.txt
+```
+
 ## Usage
 ```
 usage: awsapigatewayupsert.py [-h] --region REGION --api-name NAME --api-stage
