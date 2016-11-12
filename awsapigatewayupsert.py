@@ -296,24 +296,25 @@ def read_arguments():
 
 class LambdaAccess:
 	aws_target_region = None
-	client = None
-	function_collection = None
+
+	_client = None
+	_function_collection = None
 
 	def get_client(self):
 		# return existing Lambda API client instance, or create new
-		if (not LambdaAccess.client):
-			LambdaAccess.client = boto3.client(
+		if (not LambdaAccess._client):
+			LambdaAccess._client = boto3.client(
 				'lambda',
 				region_name = LambdaAccess.aws_target_region
 			)
 
-		return LambdaAccess.client
+		return LambdaAccess._client
 
 	def get_function_collection(self):
 		# if no function list - build now
-		if (LambdaAccess.function_collection is None):
+		if (LambdaAccess._function_collection is None):
 			Console().write_info('Fetching Lambda function list\n')
-			LambdaAccess.function_collection = {}
+			LambdaAccess._function_collection = {}
 
 			# fetch all Lambda functions for account/region - handling pagination if required over multiple API calls
 			fetch_marker = None
@@ -333,7 +334,7 @@ class LambdaAccess:
 
 						if (arn_match):
 							# add function and extracted ARN details to collection
-							LambdaAccess.function_collection[function_arn] = {
+							LambdaAccess._function_collection[function_arn] = {
 								'name': str(function_item['FunctionName']),
 								'region': arn_match.group('region'),
 								'account_id': arn_match.group('account_id')
@@ -344,7 +345,7 @@ class LambdaAccess:
 
 				fetch_marker = list_response['NextMarker']
 
-		return LambdaAccess.function_collection
+		return LambdaAccess._function_collection
 
 def get_api_export_from_api_id_stage_name(api_gateway_client,api_id,api_stage_name):
 	response_get_export = api_gateway_client.get_export(
