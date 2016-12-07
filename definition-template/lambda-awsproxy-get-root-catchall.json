@@ -24,14 +24,6 @@
 		},
 		"/{proxy+}": {
 			"get": {
-				"parameters": [
-					{
-						"in": "path",
-						"name": "proxy",
-						"required": true,
-						"type": "string"
-					}
-				],
 				"responses": {},
 				"x-amazon-apigateway-integration": {
 					"httpMethod": "POST",
