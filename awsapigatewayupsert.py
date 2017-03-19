@@ -700,7 +700,7 @@ def upsert_api_definition_lambda_apply_permissions(
 	# create set of Lambda ARN's referenced in definition
 	api_referenced_function_arn_set = {
 		item_function_arn
-		for void,void,item_function_arn in api_definition_method_path_lambda_set
+		for _,_,item_function_arn in api_definition_method_path_lambda_set
 	}
 
 	def get_api_gateway_function_invoke_policy_set(function_arn,region,account_id):
