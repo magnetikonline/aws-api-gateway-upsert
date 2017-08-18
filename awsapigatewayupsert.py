@@ -22,12 +22,12 @@ API_GATEWAY_EXPORT_TYPE = 'swagger'
 API_GATEWAY_EXPORT_PROPERTY_COLLECTION = { 'extensions': 'integrations' }
 API_GATEWAY_EXPORT_CONTENT_TYPE = 'application/json'
 
-# note: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-resource
+# note: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-resource
 API_GATEWAY_DEFINITION_RESOURCE_PATH_REGEXP = re.compile(
 	r'^(?:'
 		# root URI followed by optional catch all (greedy path variable)
 		r'(?P<root_path_uri>/)(?P<root_catch_all>\{[a-zA-Z0-9._-]+\+\})?|'
-		# one or more resource path parts [/PART_NAME] followed by optional catch all
+		# ...or, one or more resource path parts [/PART_NAME] followed by optional catch all
 		r'(?P<path_uri>(?:/[a-zA-Z0-9._-]+)+)(?:/(?P<catch_all>\{[a-zA-Z0-9._-]+\+\}))?'
 	r')$'
 )
@@ -70,7 +70,7 @@ LAMBDA_ARN_PROPERTY_REGEXP = re.compile(
 
 LAMBDA_POLICY_ACTION_INVOKE = 'lambda:InvokeFunction'
 LAMBDA_POLICY_PRINCIPAL_SERVICE = 'apigateway.amazonaws.com'
-# note: http://docs.aws.amazon.com/apigateway/latest/developerguide/permissions.html#api-gateway-calling-api-permissions
+# note: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
 LAMBDA_POLICY_API_GATEWAY_SOURCE_ARN_REGEXP = re.compile(
 	r'^arn:aws:execute-api:'
 	r'(?P<region>[a-z]{2}-[a-z]{4,}-[0-9]):'

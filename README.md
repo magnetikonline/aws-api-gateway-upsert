@@ -1,22 +1,22 @@
 # AWS API Gateway upsert
-Command line utility for upserting (create if not exist, otherwise update) [AWS API Gateway](https://aws.amazon.com/api-gateway/) instances from [Swagger 2.0](http://swagger.io/specification/) JSON definitions.
+Command line utility for upserting (create if not exist, otherwise update) [AWS API Gateway](https://aws.amazon.com/api-gateway/) instances from [Swagger 2.0](https://swagger.io/specification/) JSON definitions.
 
-Features:
-- Ability to create, update or export API Gateway instances from/to JSON Swagger definition files.
-- With API updates, automatically compares current to proposed definition - only deploying when differences are detected. Useful for continuous delivery pipelines and avoiding creation of duplicated API Gateway deployments.
-- Lambda functions referenced as integration targets can optionally have permissions [updated during the upsert process](#lambda-function-policy-creation), enabling invoke access from the API Gateway instance. This includes support for [September 2016 feature additions](https://aws.amazon.com/blogs/aws/api-gateway-update-new-features-simplify-api-development/) of:
-	- Catch-all path variables.
-	- HTTP pseudo `ANY` method.
-- Definition referenced Lambda function integration ARNs can be written in a generic format, without specifying AWS region and account ID - improving portability.
-
-In addition all upsert operations can also be executed in a dry run mode, for testing write operations actions that would be applied to the target AWS account/region.
-
+- [Features](#features)
 - [Requires](#requires)
 - [Usage](#usage)
 	- [Lambda function policy creation](#lambda-function-policy-creation)
 	- [Lambda function generic format ARNs](#lambda-function-generic-format-arns)
 - [Examples](#examples)
 - [Definition templates](#definition-templates)
+
+## Features
+- Ability to create, update or export API Gateway instances from/to JSON Swagger definition files.
+- With API updates, automatically compares current to proposed definition - only deploying when differences are detected. Useful for continuous delivery pipelines and avoiding creation of duplicated API Gateway deployments.
+- Lambda functions referenced as integration targets can optionally have permissions [updated during the upsert process](#lambda-function-policy-creation), enabling invoke access from the API Gateway instance. This includes support for [September 2016 feature additions](https://aws.amazon.com/blogs/aws/api-gateway-update-new-features-simplify-api-development/) of:
+	- Catch-all path variables.
+	- HTTP pseudo `ANY` method.
+- Definition referenced Lambda function integration ARNs can be written in a generic format, without specifying AWS region and account ID - improving portability.
+- Upsert operations can be executed in a dry run mode, for verifying operations that would be applied to the target AWS account.
 
 ## Requires
 - Python 2.7.x.
@@ -63,7 +63,7 @@ optional arguments:
 ```
 
 ### Lambda function policy creation
-For an API Gateway instance to successfully [invoke a Lambda function](http://docs.aws.amazon.com/lambda/latest/dg/with-on-demand-https.html), permissions allowing the gateway are required against the function itself.
+For an API Gateway instance to successfully [invoke a Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/with-on-demand-https.html), permissions allowing the gateway are required against the function itself.
 
 During the upsert of a definition, integration Lambda targets within the current account/region can have policies managed via `--apply-lambda-permissions` to complement gateway requirements:
 - The `exclusive` mode will **remove all** API Gateway related permissions from Lambda functions that are not associated to the upserted API. Use this mode when referenced Lambda functions are used by a *single* API Gateway instance only.
@@ -81,7 +81,7 @@ HTTP method | URI path | Generated permission
 
 **Note:**
 - The `ANY` pseudo method is represented as `x-amazon-apigateway-any-method` within Swagger definitions.
-- Policies assigned to a Lambda function can be view via the AWS CLI [`lambda get-policy`](http://docs.aws.amazon.com/cli/latest/reference/lambda/get-policy.html) command.
+- Policies assigned to a Lambda function can be view via the AWS CLI [`lambda get-policy`](https://docs.aws.amazon.com/cli/latest/reference/lambda/get-policy.html) command.
 
 ### Lambda function generic format ARNs
 Lambda function ARN integration points referenced in definitions can be written in a generic format, where the AWS region and account ID are not specified.
@@ -135,7 +135,7 @@ $ ./awsapigatewayupsert.py \
 ## Definition templates
 Example JSON Swagger 2.0 API Gateway templates for common implementation patterns:
 - [`lambda-awsproxy-any-route-cors.json`](definition-template/lambda-awsproxy-any-route-cors.json) implements:
-	- Request paths of both `/method` and `/method/*` ([catch-all](http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-resource) path) with upstream Lambda function targets via the `aws_proxy` integration type.
+	- Request paths of both `/method` and `/method/*` ([catch-all](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-resource) path) with upstream Lambda function targets via the `aws_proxy` integration type.
 	- Accepting any HTTP method verb via the pseduo `ANY` / `x-amazon-apigateway-any-method` method.
 	- [CORS policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) to match, allowing any requesting domain (via `*` wildcard).
 - [`lambda-awsproxy-classic-any-cors.json`](definition-template/lambda-awsproxy-classic-any-cors.json) implements:
@@ -143,5 +143,5 @@ Example JSON Swagger 2.0 API Gateway templates for common implementation pattern
 	- Accepting any HTTP method verb via the pseduo `ANY` / `x-amazon-apigateway-any-method` method.
 	- [CORS policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) to match, allowing any requesting domain (via `*` wildcard).
 - [`lambda-awsproxy-get-root-catchall.json`](definition-template/lambda-awsproxy-get-root-catchall.json) implements:
-	- Request paths of `/` and `/*` ([catch-all](http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-resource) path) with upstream target of a single Lambda functions via the `aws_proxy` integration type.
+	- Request paths of `/` and `/*` ([catch-all](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-resource) path) with upstream target of a single Lambda functions via the `aws_proxy` integration type.
 	- Any URI under the root for `GET` HTTP method requests and routed to the target Lambda function.
