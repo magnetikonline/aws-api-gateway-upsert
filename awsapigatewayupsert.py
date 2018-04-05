@@ -204,19 +204,19 @@ def read_arguments():
 
 	parser.add_argument(
 		'--export-file-json',
-		help = 'Export API Gateway definition to the given file',
+		help = 'export API Gateway definition to the given file',
 		metavar = 'FILE'
 	)
 
 	parser.add_argument(
 		'--generic-lambda-integration-uri',
 		action = 'store_true',
-		help = 'Exported definition will have Lambda function integration URIs converted to a generic format'
+		help = 'exported definition will have Lambda function integration URIs converted to a generic format'
 	)
 
 	parser.add_argument(
 		'--upsert-file-json',
-		help = 'Definition file to create/update an API Gateway instance from',
+		help = 'definition file to create/update an API Gateway instance from',
 		metavar = 'FILE'
 	)
 
@@ -227,20 +227,20 @@ def read_arguments():
 			LAMBDA_POLICY_APPLY_PERMISSIONS_INCLUSIVE
 		},
 		help =
-			'Update Lambda function policies referenced by API definition to enable invoke actions. '
-			'The \'exclusive\' mode removes policies unrelated to gateway instance, \'inclusive\' will preserve such policies.'
+			'update Lambda function policies referenced by API definition to enable invoke actions, '
+			'where \'exclusive\' mode removes policies unrelated to gateway instance, \'inclusive\' will preserve'
 	)
 
 	parser.add_argument(
 		'--dry-run',
 		action = 'store_true',
-		help = 'Display what would happen during API definition upsert, without committing changes'
+		help = 'display what would happen during API definition upsert, without committing changes'
 	)
 
 	parser.add_argument(
 		'--quiet',
 		action = 'store_true',
-		help = 'Suppress output during export/upsert progress'
+		help = 'suppress output during export/upsert progress'
 	)
 
 	arg_list = parser.parse_args()
