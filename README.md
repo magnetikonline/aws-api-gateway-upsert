@@ -1,4 +1,5 @@
 # AWS API Gateway upsert
+
 Command line utility for upserting (create if not exist, otherwise update) [AWS API Gateway](https://aws.amazon.com/api-gateway/) instances from [Swagger 2.0](https://swagger.io/specification/) JSON definitions.
 
 - [Features](#features)
@@ -10,6 +11,7 @@ Command line utility for upserting (create if not exist, otherwise update) [AWS 
 - [Definition templates](#definition-templates)
 
 ## Features
+
 - Ability to create, update or export API Gateway instances from/to JSON Swagger definition files.
 - With API updates, automatically compares current to proposed definition - only deploying when differences are detected. Useful for continuous delivery pipelines and avoiding creation of duplicated API Gateway deployments.
 - Lambda functions referenced as integration targets can optionally have permissions [updated during the upsert process](#lambda-function-policy-creation), enabling invoke access from the API Gateway instance. This includes support for [September 2016 feature additions](https://aws.amazon.com/blogs/aws/api-gateway-update-new-features-simplify-api-development/) of:
@@ -19,6 +21,7 @@ Command line utility for upserting (create if not exist, otherwise update) [AWS 
 - Upsert operations can be executed in a dry run mode, for verifying operations that would be applied to the target AWS account.
 
 ## Requires
+
 - Python 2.7.x.
 - [Boto 3](https://boto3.readthedocs.io/en/latest/).
 
@@ -27,6 +30,7 @@ $ pip install -r requirements.txt
 ```
 
 ## Usage
+
 ```
 usage: awsapigatewayupsert.py [-h] --region REGION --api-name NAME --api-stage
                               NAME [--export-file-json FILE]
@@ -63,35 +67,41 @@ optional arguments:
 ```
 
 ### Lambda function policy creation
+
 For an API Gateway instance to successfully [invoke a Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/with-on-demand-https.html), permissions allowing the gateway are required against the function itself.
 
 During the upsert of a definition, integration Lambda targets within the current account/region can have policies managed via `--apply-lambda-permissions` to complement gateway requirements:
+
 - The `exclusive` mode will **remove all** API Gateway related permissions from Lambda functions that are not associated to the upserted API. Use this mode when referenced Lambda functions are used by a *single* API Gateway instance only.
 - Alternatively `inclusive` mode will **retain** all permissions unrelated to the current API Gateway instance - only removing what is not directly required by the current upsert API. Use this mode when Lambda functions have dependency on *multiple* API Gateway endpoints.
 
 Some format examples of generated Lambda function permissions:
 
-HTTP method | URI path | Generated permission
-:--- | :--- | :---
-`GET` | `/` | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/GET/`
-`POST` | `/api/path` | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/POST/api/path`
-`ANY` * | `/api/path` | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/*/api/path`
-`GET` | `/api/path/{proxy+}` | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/GET/api/path/*`
-`ANY` * | `/api/path/{proxy+}` | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/*/api/path/*`
+| HTTP method | URI path             | Generated permission                                            |
+|:------------|:---------------------|:----------------------------------------------------------------|
+| `GET`       | `/`                  | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/GET/`           |
+| `POST`      | `/api/path`          | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/POST/api/path`  |
+| `ANY` *     | `/api/path`          | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/*/api/path`     |
+| `GET`       | `/api/path/{proxy+}` | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/GET/api/path/*` |
+| `ANY` *     | `/api/path/{proxy+}` | `arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/*/*/api/path/*`   |
 
 **Note:**
+
 - The `ANY` pseudo method is represented as `x-amazon-apigateway-any-method` within Swagger definitions.
 - Policies assigned to a Lambda function can be view via the AWS CLI [`lambda get-policy`](https://docs.aws.amazon.com/cli/latest/reference/lambda/get-policy.html) command.
 
 ### Lambda function generic format ARNs
+
 Lambda function ARN integration points referenced in definitions can be written in a generic format, where the AWS region and account ID are not specified.
 
 For example:
+
 ```
 arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-2:123456789012:function:lambda-function/invocations
 ```
 
 becomes:
+
 ```
 arn:aws:apigateway::lambda:path/2015-03-31/functions/arn:aws:lambda:::function:lambda-function/invocations
 ```
@@ -100,7 +110,9 @@ arn:aws:apigateway::lambda:path/2015-03-31/functions/arn:aws:lambda:::function:l
 - The export definition mode also supports writing back generic format Lambda function ARNs through use of the `--generic-lambda-integration-uri` argument.
 
 ## Examples
+
 Upsert definition JSON file `/path/to/definition.json` to an API named `my-first-api` within AWS region `ap-southeast-2` deployed to stage named `production`:
+
 ```sh
 $ ./awsapigatewayupsert.py \
 	--region ap-southeast-2 \
@@ -112,6 +124,7 @@ $ ./awsapigatewayupsert.py \
 - Upsert definition `/path/to/definition.json` to an API `my-second-api` deployed at stage `development`.
 - Lambda functions referenced within definition will have policy permissions added/removed to complement that of the definition.
 - In addition, any Lambda permissions not associated to `my-second-api` will be removed:
+
 ```sh
 $ ./awsapigatewayupsert.py \
 	--region ap-southeast-2 \
@@ -123,6 +136,7 @@ $ ./awsapigatewayupsert.py \
 
 - Export API named `my-first-api` deployed at stage `production` to a definition Swagger 2.0 JSON file `/path/to/definition.json`.
 - In addition, any Lambda function referenced integration URIs will be converted to generic form ARNs:
+
 ```sh
 $ ./awsapigatewayupsert.py \
 	--region ap-southeast-2 \
@@ -133,7 +147,9 @@ $ ./awsapigatewayupsert.py \
 ```
 
 ## Definition templates
+
 Example JSON Swagger 2.0 API Gateway templates for common implementation patterns:
+
 - [`lambda-awsproxy-any-route-cors.json`](definition-template/lambda-awsproxy-any-route-cors.json) implements:
 	- Request paths of both `/method` and `/method/*` ([catch-all](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html#api-gateway-proxy-resource) path) with upstream Lambda function targets via the `aws_proxy` integration type.
 	- Accepting any HTTP method verb via the pseduo `ANY` / `x-amazon-apigateway-any-method` method.
